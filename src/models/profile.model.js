@@ -4,6 +4,9 @@ export const ProfileSchema = new Schema({
   name: {
     type: String,
   },
+  email: {
+    type: String,
+  },
   image: {
     type: String,
   },

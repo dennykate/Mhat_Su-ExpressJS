@@ -1,44 +1,47 @@
-import tryCatch from "../helper/tryCatch.js";
+import { BadRequestError } from "../helper/customErrors.js";
+
+import getOAuthUserInfo from "../libs/getOAuthUserInfo.js";
 import { generate } from "../libs/jwt.js";
+
 import AuthModel from "../models/auth.model.js";
 import ProfileModel from "../models/profile.model.js";
 
 export const _googleAuth = async (req) => {
   const userInfo = await getOAuthUserInfo(req.body["access_token"]);
-  const { email, sub, id } = userInfo;
 
-  console.log("user info", userInfo);
+  if (userInfo?.error) throw new BadRequestError("Invalid Credentials");
 
-  return;
+  const { email, sub, name, picture } = userInfo;
 
-  const isExistUser = await AuthModel.findOne({ google_id: id });
+  const isExistUser = await AuthModel.findOne({ google_id: sub });
 
   if (isExistUser) {
     const payload = {
       id: isExistUser._id,
-      verified_at: isExistUser.verified_at,
     };
 
     const token = generate(payload);
 
-    return { access_token: token, is_verified: !!payload["verified_at"] };
+    return { token };
   } else {
-    const newUser = await User.create({
-      name: null,
-      email,
-      password: null,
-      verified_at: new Date(),
+    const newUser = await AuthModel.create({
       google_id: sub,
+    });
+
+    await ProfileModel.create({
+      name,
+      email,
+      image: picture,
+      auth: newUser._id,
     });
 
     const payload = {
       id: newUser._id,
-      verified_at: newUser.verified_at,
     };
 
     const token = generate(payload);
 
-    return { access_token: token, is_verified: !!payload["verified_at"] };
+    return { token };
   }
 };
 

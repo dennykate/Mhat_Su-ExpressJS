@@ -1,6 +1,6 @@
 // NotFoundError class for 404 errors
 export class NotFoundError extends Error {
-  constructor(message) {
+  constructor(message = "Not found") {
     super(message);
     this.statusCode = 404;
   }
@@ -24,7 +24,7 @@ export class UnauthorizedError extends Error {
 
 // InternalServerError class for 500 errors
 export class InternalServerError extends Error {
-  constructor(message) {
+  constructor(message = "Internal server error") {
     super(message);
     this.statusCode = 500;
   }
@@ -32,7 +32,7 @@ export class InternalServerError extends Error {
 
 // BadRequestError class for 400 errors
 export class BadRequestError extends Error {
-  constructor(message) {
+  constructor(message = "Something wrong") {
     super(message);
     this.statusCode = 400;
   }

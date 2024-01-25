@@ -1,6 +1,7 @@
 import { UnauthorizedError } from "../helper/customErrors.js";
 import { decode } from "../libs/jwt.js";
 import { _getAuth } from "../services/auth.service.js";
+import { _getProfile } from "../services/profile.service.js";
 
 export default async (req, res, next) => {
   try {
@@ -22,7 +23,9 @@ export default async (req, res, next) => {
 
     if (!auth) next(new UnauthorizedError());
 
-    req.user = { ...auth, auth_type: payload.auth_type };
+    const profile = await _getProfile(auth.id);
+
+    req.user = { ...auth._doc, profile, auth_type: payload.auth_type };
 
     return next();
   } catch (err) {
