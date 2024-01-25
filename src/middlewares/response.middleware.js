@@ -3,8 +3,8 @@ export default (req, res, next) => {
     res.status(statusCode).json({ success: true, data });
   };
 
-  res.error = (data, statusCode = 400) => {
-    res.status(statusCode).json({ success: false, data });
+  res.error = (message, statusCode = 400) => {
+    res.status(statusCode).json({ success: false, message });
   };
 
   return next();

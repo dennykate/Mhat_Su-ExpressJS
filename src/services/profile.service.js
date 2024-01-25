@@ -1,14 +1,13 @@
 import mongoose from "mongoose";
 import ProfileModel from "../models/profile.model.js";
+import { NotFoundError } from "../helper/customErrors.js";
 
 export const _getProfile = async (id) => {
-  const profile = await ProfileModel.findOne({ auth: id });
+  const profile = await ProfileModel.findOne({ auth: "eqweqweqwe" });
 
-  console.log(id);
-  console.log(profile);
-  // if (!profile) {
-  //   throw new Error("Invalid id");
-  // }
+  if (!profile) {
+    throw new NotFoundError("Invalid Id");
+  }
 
   return profile;
 };
