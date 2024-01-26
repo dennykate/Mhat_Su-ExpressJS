@@ -1,4 +1,5 @@
 import { BadRequestError } from "../helper/customErrors.js";
+import getFacebookUserInfo from "../libs/getFacebookUserInfo.js";
 
 import getOAuthUserInfo from "../libs/getOAuthUserInfo.js";
 import { generate } from "../libs/jwt.js";
@@ -45,32 +46,43 @@ export const _googleAuth = async (req) => {
   }
 };
 
-export const createAuth = async (user, type) => {
-  const store_id = type === "google" ? "google_id" : "facebook_id";
+export const _facebookAuth = async (req) => {
+  const userInfo = await getFacebookUserInfo(req.body["access_token"]);
 
-  const isExist = await AuthModel.findOne({ [store_id]: user?.id });
+  if (userInfo?.error) throw new BadRequestError("Invalid Credentials");
 
-  if (isExist) {
-    const token = generate({ id: isExist.id, auth_type: "google" });
+  const { name, email, picture, id } = userInfo;
+
+  const isExistUser = await AuthModel.findOne({ facebook_id: id });
+
+  if (isExistUser) {
+    const payload = {
+      id: isExistUser._id,
+    };
+
+    const token = generate(payload);
+
+    return { token };
+  } else {
+    const newUser = await AuthModel.create({
+      facebook_id: id,
+    });
+
+    await ProfileModel.create({
+      name: name,
+      email: email,
+      image: picture?.data?.url,
+      auth: newUser._id,
+    });
+
+    const payload = {
+      id: newUser._id,
+    };
+
+    const token = generate(payload);
 
     return { token };
   }
-
-  const auth = await AuthModel.create({
-    [store_id]: user?.id,
-  });
-
-  ProfileModel.create({
-    name: user?.displayName,
-    image: user?.photos[0]?.value,
-    auth: auth._id,
-  });
-
-  console.log(auth);
-
-  const token = generate({ id: auth.id, auth_type: type });
-
-  return { token };
 };
 
 export const _getAuth = async (id) => {
