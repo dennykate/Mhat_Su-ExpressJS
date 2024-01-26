@@ -1,18 +1,17 @@
 import express from "express";
 import bodyParser from "body-parser";
-import cors from "cors";
 import mongoose from "mongoose";
 
 import config from "./src/config/index.js";
-import corsOptions from "./src/helper/corsOptions.js";
 
 import routes from "./src/routes/index.js";
 import responseMiddleware from "./src/middlewares/response.middleware.js";
 import errorHandlerMiddleware from "./src/middlewares/errorHandler.middleware.js";
+import corsMiddleware from "./src/middlewares/cors.middleware.js";
 
 const app = express();
 
-app.use(cors(corsOptions));
+app.use(corsMiddleware);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
