@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
+import multer from "multer";
 
 import config from "./src/config/index.js";
 
@@ -10,10 +11,17 @@ import errorHandlerMiddleware from "./src/middlewares/errorHandler.middleware.js
 import corsMiddleware from "./src/middlewares/cors.middleware.js";
 
 const app = express();
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
-app.use(corsMiddleware);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+// parse formData
+app.use(upload.single("image"));
+
+// for cors protection
+app.use(corsMiddleware);
 
 // for success and error response
 app.use(responseMiddleware);
