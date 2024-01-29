@@ -21,16 +21,12 @@ export const _googleAuth = async (req) => {
       id: isExistUser._id,
     };
 
-    await ProfileModel.findOneAndUpdate(
-      { auth: isExistUser._id },
-      {
-        $set: {
-          name: name,
-          image: picture,
-        },
-      },
-      { new: true }
-    );
+    const profile = await ProfileModel.findOne({ auth: isExistUser._id });
+
+    profile.name = profile.name === name ? profile.name : name;
+    profile.image = profile.image === picture ? profile.image : picture;
+
+    await profile.save();
 
     const token = generate(payload);
 
@@ -71,16 +67,12 @@ export const _facebookAuth = async (req) => {
       id: isExistUser._id,
     };
 
-    await ProfileModel.findOneAndUpdate(
-      { auth: isExistUser._id },
-      {
-        $set: {
-          name: name,
-          image: picture,
-        },
-      },
-      { new: true }
-    );
+    const profile = await ProfileModel.findOne({ auth: isExistUser._id });
+
+    profile.name = profile.name === name ? profile.name : name;
+    profile.image = profile.image === picture ? profile.image : picture;
+
+    await profile.save();
 
     const token = generate(payload);
 
