@@ -21,6 +21,17 @@ export const _googleAuth = async (req) => {
       id: isExistUser._id,
     };
 
+    await ProfileModel.findOneAndUpdate(
+      { auth: isExistUser._id },
+      {
+        $set: {
+          name: name,
+          image: picture,
+        },
+      },
+      { new: true }
+    );
+
     const token = generate(payload);
 
     return { token };
@@ -59,6 +70,17 @@ export const _facebookAuth = async (req) => {
     const payload = {
       id: isExistUser._id,
     };
+
+    await ProfileModel.findOneAndUpdate(
+      { auth: isExistUser._id },
+      {
+        $set: {
+          name: name,
+          image: picture,
+        },
+      },
+      { new: true }
+    );
 
     const token = generate(payload);
 
