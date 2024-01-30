@@ -2,7 +2,7 @@ import { BadRequestError } from "../helper/customErrors.js";
 import getFacebookUserInfo from "../libs/getFacebookUserInfo.js";
 
 import getOAuthUserInfo from "../libs/getOAuthUserInfo.js";
-import { generate } from "../libs/jwt.js";
+import { decode, generate } from "../libs/jwt.js";
 
 import AuthModel from "../models/auth.model.js";
 import ProfileModel from "../models/profile.model.js";
@@ -17,39 +17,46 @@ export const _googleAuth = async (req) => {
   const isExistUser = await AuthModel.findOne({ google_id: sub });
 
   if (isExistUser) {
-    const payload = {
+    const profile = await ProfileModel.findOne({ auth: isExistUser._id });
+
+    const access_payload = {
+      id: isExistUser._id,
+      profile,
+    };
+
+    const refresh_payload = {
       id: isExistUser._id,
     };
 
-    const profile = await ProfileModel.findOne({ auth: isExistUser._id });
+    const access_token = generate(access_payload, "access");
+    const refresh_token = generate(refresh_payload, "refresh");
 
-    profile.name = profile.name === name ? profile.name : name;
-    profile.image = profile.image === picture ? profile.image : picture;
-
-    await profile.save();
-
-    const token = generate(payload);
-
-    return { token };
+    return { access_token, refresh_token };
   } else {
     const newUser = await AuthModel.create({
       google_id: sub,
     });
 
-    await ProfileModel.create({
+    const profile = await ProfileModel.create({
       name,
       email,
       image: picture,
       auth: newUser._id,
     });
 
-    const payload = {
+    const access_payload = {
+      id: newUser._id,
+      profile,
+    };
+
+    const refresh_payload = {
       id: newUser._id,
     };
 
-    const token = generate(payload);
+    const access_token = generate(access_payload, "access");
+    const refresh_token = generate(refresh_payload, "refresh");
 
-    return { token };
+    return { access_token, refresh_token };
   }
 };
 
@@ -63,42 +70,75 @@ export const _facebookAuth = async (req) => {
   const isExistUser = await AuthModel.findOne({ facebook_id: id });
 
   if (isExistUser) {
-    const payload = {
+    const profile = await ProfileModel.findOne({ auth: isExistUser._id });
+
+    const access_payload = {
+      id: isExistUser._id,
+      profile,
+    };
+
+    const refresh_payload = {
       id: isExistUser._id,
     };
 
-    const profile = await ProfileModel.findOne({ auth: isExistUser._id });
+    const access_token = generate(access_payload, "access");
+    const refresh_token = generate(refresh_payload, "refresh");
 
-    profile.name = profile.name === name ? profile.name : name;
-    profile.image = profile.image === picture ? profile.image : picture;
-
-    await profile.save();
-
-    const token = generate(payload);
-
-    return { token };
+    return { access_token, refresh_token };
   } else {
     const newUser = await AuthModel.create({
       facebook_id: id,
     });
 
-    await ProfileModel.create({
+    const profile = await ProfileModel.create({
       name: name,
       email: email,
       image: picture?.data?.url,
       auth: newUser._id,
     });
 
-    const payload = {
+    const access_payload = {
+      id: newUser._id,
+      profile,
+    };
+
+    const refresh_payload = {
       id: newUser._id,
     };
 
-    const token = generate(payload);
+    const access_token = generate(access_payload, "access");
+    const refresh_token = generate(refresh_payload, "refresh");
 
-    return { token };
+    return { access_token, refresh_token };
   }
 };
 
 export const _getAuth = async (id) => {
   return await AuthModel.findById(id);
+};
+
+export const _refreshToken = async (req) => {
+  const body = req.body;
+
+  const payload = await decode(body.refresh_token);
+
+  const auth = await AuthModel.findById(payload.id);
+
+  if (!auth) throw new BadRequestError("User not found");
+
+  const profile = await ProfileModel.findOne({ auth: payload.id });
+
+  const access_payload = {
+    id: auth._id,
+    profile,
+  };
+
+  const refresh_payload = {
+    id: auth.id,
+  };
+
+  const access_token = generate(access_payload, "access");
+  const refresh_token = generate(refresh_payload, "refresh");
+
+  return { access_token, refresh_token };
 };
