@@ -32,7 +32,7 @@ app.use(config.API_PREFIX + "/v1", routes);
 // error handling
 app.use(errorHandlerMiddleware);
 
-app.get("/ping", (req, res) => {
+app.get("/api/v1/ping", (req, res) => {
   return res.status(200).json({ message: "pong" });
 });
 
