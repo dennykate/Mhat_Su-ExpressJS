@@ -7,8 +7,15 @@ import {
 } from "../services/note.service.js";
 
 export const getNotes = tryCatch(async (req, res) => {
-  const notes = await _getNotes(req);
-  return res.success(notes);
+  const [count, data] = await _getNotes(req);
+  
+  return res.success(data, 200, {
+    meta: {
+      count,
+      page: parseInt(req.query.page) || 1,
+      limit: parseInt(req.query.limit) || 20,
+    },
+  });
 });
 
 export const createNote = tryCatch(async (req, res) => {
