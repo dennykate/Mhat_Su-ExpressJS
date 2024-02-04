@@ -8,6 +8,6 @@ export default {
   API_PREFIX: "/api",
   secret_key: process.env.SECRET || "Secret for jsonwebtoken",
   refresh_token_expiry: process.env.REFRESH_TOKEN_EXPIRY || "7d",
-  access_token_expiry: process.env.ACCESS_TOKEN_EXPIRY || 3600,
+  access_token_expiry: process.env.ACCESS_TOKEN_EXPIRY || "1d",
   sessionKey: `${Math.floor(Math.random() * 10000000)}`,
 };

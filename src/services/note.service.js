@@ -1,10 +1,19 @@
 import { NotFoundError } from "../helper/customErrors.js";
+import { ModelProvider } from "./modelProvider.service.js";
 import NoteModel from "../models/note.model.js";
 
+// export const _getNotes = async (req) => {
+//   const auth = req.user._id;
+//   const notes = await NoteModel.find({ auth });
+//   return notes;
+// };
+
 export const _getNotes = async (req) => {
-  const auth = req.user._id;
-  const notes = await NoteModel.find({ auth });
-  return notes;
+  const Model = new ModelProvider(NoteModel, req);
+
+  const [count, data] = await Model.searchWith(["title", "theme"]).get();
+
+  return [count, data];
 };
 
 export const _createNote = async (req) => {
