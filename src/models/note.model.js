@@ -13,6 +13,30 @@ export const NoteSchema = new Schema({
     type: String,
     required: true,
   },
+  list: [
+    {
+      _id: {
+        type: String,
+        required: true,
+      },
+      text: {
+        type: String,
+        required: true,
+      },
+      priority: {
+        type: Number,
+        required: true,
+      },
+      is_complete: {
+        type: Boolean,
+        required: true,
+      },
+      is_fail: {
+        type: Boolean,
+        required: true,
+      },
+    },
+  ],
 });
 
 const NoteModel = modelNames.Note || model("Note", NoteSchema);
