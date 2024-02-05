@@ -4,31 +4,31 @@ import ThemeModel from "../models/theme.model.js";
 
 export const _getThemes = async (req) => {
   const auth = req.user._id;
-  const themes = await ThemeModel.find({ auth });
+  const themes = await ThemeModel.findOne({ auth });
+
   return themes;
 };
 
-export const _createTheme = async (req) => {
-  const { name, bg_color, font_family } = req.body;
-  const auth = req.user._id;
+export const _createTheme = async (auth, body) => {
+  const { name, bg_color, font_family } = body;
   const theme = await ThemeModel.create({
     auth,
     name,
     bg_color,
     font_family,
   });
+
   return theme;
 };
 
 export const _updateTheme = async (req) => {
-  const { id } = req.params;
   const name = req.body.name;
   const bg_color = req.body.bg_color;
   const font_family = req.body.font_family;
+  const auth = req.user._id;
 
-  const theme = await ThemeModel.findOne({ _id: id });
+  const theme = await ThemeModel.findOne({ auth });
 
-  console.log(theme);
   if (!theme) throw new NotFoundError();
 
   theme.name = name ?? theme.name;
@@ -49,4 +49,17 @@ export const _deleteTheme = async (req) => {
   if (!theme) throw new NotFoundError();
 
   await theme.deleteOne({ _id: id });
+};
+
+export const _setDefault = async (req) => {
+  const auth = req.user._id;
+  const theme = await ThemeModel.findOne({ auth });
+
+  theme.name = "default";
+  theme.bg_color = "#f5f5f5";
+  theme.font_family = "roboto";
+
+  await theme.save();
+
+  return theme;
 };

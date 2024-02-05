@@ -6,6 +6,7 @@ import { decode, generate } from "../libs/jwt.js";
 
 import AuthModel from "../models/auth.model.js";
 import ProfileModel from "../models/profile.model.js";
+import { _createTheme } from "./theme.service.js";
 
 export const _googleAuth = async (req) => {
   const userInfo = await getOAuthUserInfo(req.body["access_token"]);
@@ -55,6 +56,12 @@ export const _googleAuth = async (req) => {
 
     const access_token = generate(access_payload, "access");
     const refresh_token = generate(refresh_payload, "refresh");
+
+    await _createTheme(newUser._id, {
+      name: "default",
+      bg_color: "#f5f5f5",
+      font_family: "roboto",
+    });
 
     return { access_token, refresh_token };
   }
@@ -108,6 +115,12 @@ export const _facebookAuth = async (req) => {
 
     const access_token = generate(access_payload, "access");
     const refresh_token = generate(refresh_payload, "refresh");
+
+    await _createTheme(newUser._id, {
+      name: "default",
+      bg_color: "#f5f5f5",
+      font_family: "roboto",
+    });
 
     return { access_token, refresh_token };
   }
