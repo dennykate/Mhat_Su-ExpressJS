@@ -2,6 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import multer from "multer";
+import cors from "cors";
 
 import config from "./src/config/index.js";
 
@@ -13,12 +14,6 @@ import corsMiddleware from "./src/middlewares/cors.middleware.js";
 const app = express();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-
-// parse formData
-app.use(upload.single("image"));
 
 // for cors protection
 const allowedOrigins = ["http://localhost:5173/"];
@@ -36,6 +31,12 @@ const corsOptions = {
 
 // Enable CORS with specific options
 app.use(cors(corsOptions));
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// parse formData
+app.use(upload.single("image"));
 
 // for success and error response
 app.use(responseMiddleware);
