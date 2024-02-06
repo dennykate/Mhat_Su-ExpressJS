@@ -21,7 +21,21 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(upload.single("image"));
 
 // for cors protection
-app.use(corsMiddleware);
+const allowedOrigins = ["http://localhost:5173"];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+
+// Enable CORS with specific options
+app.use(cors(corsOptions));
 
 // for success and error response
 app.use(responseMiddleware);
