@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(upload.single("image"));
 
 // for cors protection
-const allowedOrigins = ["http://localhost:5173"];
+const allowedOrigins = ["http://localhost:5173/"];
 
 const corsOptions = {
   origin: (origin, callback) => {
