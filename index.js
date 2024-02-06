@@ -15,22 +15,8 @@ const app = express();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// for cors protection
-const allowedOrigins = ["http://localhost:5173/"];
-
-const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-};
-
 // Enable CORS with specific options
-app.use(cors(corsOptions));
+app.use(cors("*"));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
