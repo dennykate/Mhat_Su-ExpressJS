@@ -20,11 +20,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse formData
 app.use(upload.single("image"));
 
-// cors protection
-app.use(corsMiddleware);
-
 // for success and error response
 app.use(responseMiddleware);
+
+// cors protection
+app.use(corsMiddleware);
 
 // implement routes
 app.use(config.API_PREFIX + "/v1", routes);

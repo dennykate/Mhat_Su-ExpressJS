@@ -13,6 +13,14 @@ export const NoteSchema = new Schema({
     type: String,
     required: true,
   },
+  status: {
+    type: String,
+    enum: ["private", "public"],
+    required: true,
+  },
+  users: {
+    type: Array,
+  },
   list: [
     {
       _id: {
