@@ -13,6 +13,6 @@ api.use("/auth", authRoutes);
 api.use("/profile", authMiddleware, profileRoutes);
 api.use("/notes", authMiddleware, noteRoutes);
 api.use("/themes", authMiddleware, themeRoutes);
-api.use("/note-lists", authMiddleware, noteListRoutes);
+api.use("/notes", authMiddleware, noteListRoutes);
 
 export default api;

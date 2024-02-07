@@ -9,3 +9,7 @@ export const UpdateNoteSchema = Joi.object({
   title: Joi.string(),
   theme: Joi.string(),
 });
+
+export const ShareNoteSchema = Joi.object({
+  userId: Joi.string().required(),
+});
