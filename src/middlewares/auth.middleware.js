@@ -29,7 +29,6 @@ export default async (req, res, next) => {
 
     return next();
   } catch (err) {
-    console.log(err);
     return next(new UnauthenticatedError("Token expired"));
   }
 };

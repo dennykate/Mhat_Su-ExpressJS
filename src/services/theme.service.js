@@ -45,7 +45,6 @@ export const _deleteTheme = async (req) => {
 
   const theme = await ThemeModel.findOne({ _id: id });
 
-  console.log(theme);
   if (!theme) throw new NotFoundError();
 
   await theme.deleteOne({ _id: id });
