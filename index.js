@@ -36,7 +36,7 @@ app.get("/", (req, res) => {
   return res.status(200).json({ message: "Mhat Su" });
 });
 
-app.get("/api/v1/ping", (req, res) => {
+app.get("/ping", (req, res) => {
   return res.status(200).json({ message: "pong" });
 });
 
