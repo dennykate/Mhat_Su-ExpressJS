@@ -6,7 +6,7 @@ export class NotFoundError extends Error {
   }
 }
 
-// UnauthorizedError class for 401 errors
+// UnauthenticatedError class for 403 errors
 export class UnauthenticatedError extends Error {
   constructor(message = "Unauthenticated") {
     super(message);

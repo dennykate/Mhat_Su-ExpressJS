@@ -1,7 +1,7 @@
-import { UnauthenticatedError } from "../helper/customErrors.js";
+import { UnauthenticatedError } from "../helper/custom-errors.js";
 import { decode } from "../libs/jwt.js";
-import { _getAuth } from "../services/auth.service.js";
-import { _getProfile } from "../services/profile.service.js";
+
+import { findUserService } from "../services/user.service.js";
 
 export default async (req, res, next) => {
   try {
@@ -19,16 +19,15 @@ export default async (req, res, next) => {
 
     const payload = await decode(token);
 
-    const auth = await _getAuth(payload.id);
+    const user = await findUserService(payload.id);
 
-    if (!auth) next(new UnauthenticatedError());
+    if (!user) next(new UnauthenticatedError());
 
-    const profile = await _getProfile(auth.id);
-
-    req.user = { ...auth._doc, profile, auth_type: payload.auth_type };
+    req.user = user;
 
     return next();
   } catch (err) {
+    console.log("error => ", err);
     return next(new UnauthenticatedError("Token expired"));
   }
 };

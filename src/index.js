@@ -2,13 +2,14 @@ import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import multer from "multer";
+import http from "http";
 
-import config from "./src/config/index.js";
-
-import routes from "./src/routes/index.js";
-import responseMiddleware from "./src/middlewares/response.middleware.js";
-import errorHandlerMiddleware from "./src/middlewares/errorHandler.middleware.js";
-import corsMiddleware from "./src/middlewares/cors.middleware.js";
+import config from "./config/index.js";
+import routes from "./routes/index.js";
+import responseMiddleware from "./middlewares/response.middleware.js";
+import errorHandlerMiddleware from "./middlewares/errorHandler.middleware.js";
+import corsMiddleware from "./middlewares/cors.middleware.js";
+import initializeSocket from "./socket/socket.js";
 
 const app = express();
 const storage = multer.memoryStorage();
@@ -33,16 +34,22 @@ app.use(config.API_PREFIX + "/v1", routes);
 app.use(errorHandlerMiddleware);
 
 app.get("/", (req, res) => {
-  return res.status(200).json({ message: "Mhat Su" });
+  return res.status(200).json({ message: "Singa Chat" });
 });
 
 app.get("/ping", (req, res) => {
   return res.status(200).json({ message: "pong" });
 });
 
+// Create the HTTP server
+const server = http.createServer(app);
+
+// Initialize Socket.IO
+const io = initializeSocket(server);
+
 mongoose.connect(config.MONGO_URL).then(() => {
   console.log("DB connected");
-  app.listen(config.PORT, () => {
+  server.listen(config.PORT, () => {
     console.log(`Server running at port - ${config.PORT}`);
   });
 });

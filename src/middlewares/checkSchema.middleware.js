@@ -1,4 +1,4 @@
-import { BadRequestError } from "../helper/customErrors.js";
+import { BadRequestError } from "../helper/custom-errors.js";
 
 const checkSchema = ({ schema }) => {
   return async (req, res, next) => {
