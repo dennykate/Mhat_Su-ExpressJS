@@ -1,4 +1,5 @@
 import { NotFoundError } from "../helper/custom-errors.js";
+import MessageModel from "../models/message.model.js";
 import UserModel from "../models/user.model.js";
 
 export const findUserService = async (_id) => {
@@ -14,5 +15,18 @@ export const findAllUserService = async (req) => {
     created_at: 1,
   });
 
-  return users;
+  const userWithMessages = await Promise.all(
+    users.map(async (user) => {
+      const message = await MessageModel.findOne({ recipient: user._id }).sort({
+        createdAt: -1,
+      });
+
+      return {
+        ...user.toObject(),
+        lastMessage: message ? message.content : "",
+      };
+    })
+  );
+
+  return userWithMessages;
 };

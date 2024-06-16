@@ -1,4 +1,3 @@
-import { now } from "mongoose";
 import { BadRequestError, NotFoundError } from "../helper/custom-errors.js";
 import MessageModel from "../models/message.model.js";
 import tryCatch from "../helper/try-catch.js";
@@ -62,4 +61,58 @@ export const updateMessageService = tryCatch(async (data) => {
   await message.save();
 
   return message;
+});
+
+export const findAllMessageService = tryCatch(async (req) => {
+  const { page = 1, sender, recipient } = req.query;
+  const userId = req.user._id;
+
+  const query = {};
+  if (sender) query.sender = sender;
+  if (recipient) query.recipient = recipient;
+
+  const messages = await MessageModel.find(query)
+    .populate({
+      path: "sender",
+      select: "name email",
+    })
+    .populate({
+      path: "recipient",
+      select: "name email",
+    })
+    .populate({
+      path: "reactions.user",
+      select: "name email",
+    })
+    .skip((page - 1) * 50)
+    .limit(50)
+    .sort({ createdAt: -1 });
+
+  // if (!messages.length) {
+  //   throw new NotFoundError("No messages found");
+  // }
+
+  const messageDetails = messages?.map((message) => {
+    const totalReactions = message.reactions.length;
+
+    if (
+      message.recipient._id.toString() === userId.toString() &&
+      !message.isRead
+    ) {
+      message.isRead = true;
+      message.save();
+    }
+
+    return {
+      ...message.toObject(),
+      totalReactions,
+    };
+  });
+
+  return {
+    page,
+    limit: 50,
+    totalMessages: messageDetails.length,
+    messages: messageDetails,
+  };
 });

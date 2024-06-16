@@ -33,7 +33,7 @@ const initializeSocket = (server) => {
     socket.on("new-user", async (data) => {
       const { user } = await decode(data.accessToken);
 
-      io.emit("new-user", { user });
+      io.emit("new-user", { user: { ...user, lastMessage: "" } });
     });
 
     socket.on("init-chat", (userId) => {
